@@ -5,15 +5,17 @@ const User = require("../models/user");
 const Session = require("../models/session");
 const bcrypt = require("bcryptjs-then");
 const jwt = require("jsonwebtoken");
+const Activities = require("../models/activities");
+const Day = require("../models/day");
+const Symptom = require("../models/symptom");
+const Week = require("../models/week");
 
 async function validatePassword(plainPassword, hashedPassword) {
   return await bcrypt.compare(plainPassword, hashedPassword);
 }
-
 async function hashPassword(password) {
   return await bcrypt.hash(password, 10);
 }
-
 const getClientIp = (req) =>
   req.headers["x-forwarded-for"] || req.connection.remoteAddress;
 
@@ -22,6 +24,7 @@ router
   .get("/", (req, res) => {
     User.findAll()
       .then((user) => {
+        console.log("USers : ",user)
         res.json(user);
         res.sendStatus(200);
       })
@@ -112,10 +115,13 @@ router
         });
       } else {
         let newUser = {
+          // id: "ads21312dsa",
           fullName,
           email,
           password: hashedPassword,
           role,
+          createdAt: new Date(),
+          updatedAt: new Date()
         };
 
         const accessToken = jwt.sign(
@@ -144,6 +150,79 @@ router
       console.log(err);
       next(err);
     }
-  });
+  })
+  .post("/users", async (req, res, next) => {
+    User.findAll()
+    .then((users) => {
+      res.status(201).json(users);
+    })
+    .catch((error) => {
+      res.status(401);
+    });
+  })
+  .post("/activities", async (req, res, next) => {
+    Activities.findAll()
+    .then((users) => {
+      res.status(201).json(users);
+    })
+    .catch((error) => {
+      res.status(401);
+    });
+  })
+  .post("/day", async (req, res, next) => {
+    Day.findAll()
+    .then((users) => {
+      res.status(201).json(users);
+    })
+    .catch((error) => {
+      res.status(401);
+    });
+  })
+  .post("/symptom", async (req, res, next) => {
+    Symptom.findAll()
+    .then((users) => {
+      res.status(201).json(users);
+    })
+    .catch((error) => {
+      res.status(401);
+    });
+  })
+  .post("/week", async (req, res, next) => {
+    Week.findAll()
+    .then((users) => {
+      res.status(201).json(users);
+    })
+    .catch((error) => {
+      res.status(401);
+    });
+  })
+  .post("/removeAll", async (req, res, next) => {
+    User.destroy({
+      where: {},
+      truncate: true
+    })
+    Session.destroy({
+      where: {},
+      truncate: true
+    })
+    Activities.destroy({
+      where: {},
+      truncate: true
+    })
+    Day.destroy({
+      where: {},
+      truncate: true
+    })
+    Symptom.destroy({
+      where: {},
+      truncate: true
+    })
+    Week.destroy({
+      where: {},
+      truncate: true
+    })
+    res.status(200)
+  })
+
 
 module.exports = router;

@@ -336,7 +336,7 @@ router
     const { activities, userId } = req.body;
     await activities?.map(async (activity) => {
       await Activities.update(
-        { hasCompleted: activity.hasCompleted, exertion: activity.exertion },
+        { hasCompleted: activity?.hasCompleted, exertion: activity.exertion },
         { where: { id: activity.id, userId: userId } }
       )
         .then((e) => {
@@ -384,47 +384,54 @@ router
       });
   })
   .post("/summary", async (req, res) => {
-    const { userId, startDay, month } = req.body;
+    const { userId, startDay, showMonthlyView } = req.body;
 
-    if (startDay === "0") {
+    if (showMonthlyView) {
+      console.log(
+        "****************************",
+        startDay,
+        "*******************"
+      );
       knexDB("weeks")
         .innerJoin("days", "weeks.id", "=", "days.weekId")
         .innerJoin("activities", "days.id", "=", "activities.dayId")
         .where("weeks.userId", userId)
-        // .where("activities.hasCompleted", "IS NOT", null)
-        .options({ nestTables: true })
+        .where("activities?.hasCompleted", "IS NOT", null)
+        // .options({ nestTables: true })
         .select("weeks.*", "days.*", "activities.*")
         .then((data) => {
           // console.log(data);
-          let week;
-          let days = [];
-          let activities = [];
-          console.log("startDay : =====> ", startDay);
+          // let week;
+          // let days = [];
+          // let activities = [];
+          // console.log("startDay : =====> ", startDay);
 
-          data.map((d, i) => {
-            console.log(
-              "===== > ",
-              startDay,
-              month,
-              d?.days?.date?.substring(0, 2) === month
-            );
-            if (d?.days?.date.substring(0, 2) === month) {
-              week = d.weeks;
-              days.push(d.days);
+          // data.map((d, i) => {
+          //   console.log(
+          //     "===== > ",
+          //     startDay,
+          //     month,
+          //     d?.days?.date?.substring(0, 2) === month
+          //   );
+          //   if (d?.days?.date.substring(0, 2) === month) {
+          //     week = d.weeks;
+          //     days.push(d.days);
 
-              if (d.activities.hasCompleted === 0) {
-                activities.push({ ...d.activities, mET: 0 });
-              } else {
-                activities.push(d.activities);
-              }
-            }
-          });
+          //     if (d.activities?.hasCompleted === 0) {
+          //       activities.push({ ...d.activities, mET: 0 });
+          //     } else {
+          //       activities.push(d.activities);
+          //     }
+          //   }
+          // });
 
+          // console.log(" ===============> ",days, " ================= ");
           let newDays = [
-            ...new Map(days.map((item) => [item["id"], item])).values(),
+            ...new Map(data.map((item) => [item["id"], item])).values(),
           ];
 
-          res.status(200).json({ week, days: newDays, activities });
+          res.status(200).json(newDays);
+          // res.status(200).json({ week, days: newDays, activities });
         })
         .catch((err) => console.log("err : ", err));
     } else {
@@ -434,32 +441,34 @@ router
         .where("weeks.userId", userId)
         .where("weeks.startDay", startDay)
         .where("activities.hasCompleted", "IS NOT", null)
-        .options({ nestTables: true })
+        // .options({ nestTables: true })
         .select("weeks.*", "days.*", "activities.*")
         .then((data) => {
           // console.log("No Months", userId, startDay, month, data);
 
-          // console.log(data);
-          let week;
-          let days = [];
-          let activities = [];
+          // let week;
+          // let days = [];
+          // let activities = [];
 
-          data.map((d, i) => {
-            week = d.weeks;
-            days.push(d.days);
+          // data.map((d, i) => {
+          //   week = d.weeks;
+          //   days.push(d.days);
 
-            if (d.activities.hasCompleted === 0) {
-              activities.push({ ...d.activities, mET: 0 });
-            } else {
-              activities.push(d.activities);
-            }
-          });
+          //   if (d.activities?.hasCompleted === 0) {
+          //     activities.push({ ...d.activities, mET: 0 });
+          //   } else {
+          //     activities.push(d.activities);
+          //   }
+          // });
 
+          // console.log(" ===============> ",data, " ================= ");
           let newDays = [
-            ...new Map(days.map((item) => [item["id"], item])).values(),
+            ...new Map(data.map((item) => [item["id"], item])).values(),
           ];
+          console.log(" ===============> ", newDays, " =================>");
 
-          res.status(200).json({ week, days: newDays, activities });
+          res.status(200).json(newDays);
+          // res.status(200).json({ week, days: days, activities });
         })
         .catch((err) => console.log("err : ", err));
     }
