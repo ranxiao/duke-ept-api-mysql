@@ -10,6 +10,14 @@ const config = require("../config/knexfile");
 const knexDB = knex(config.development);
 // END OF KNEX
 
+const getFirstDayOfWeek = () => {
+  let d = new Date();
+  // var diff = date.getDate() - date.getDay() + (date.getDay() === 0 ? -6 : 1);
+
+  var day = d.getDay(),
+    diff = d.getDate() - day + (day == 0 ? -6 : 1); // adjust when day is sunday
+  return new Date(d.setDate(diff));
+};
 const getDayOfWeek = (e, add) => {
   let d = new Date(e);
   var day = d.getDay(),
@@ -79,17 +87,13 @@ router
 
     await Week.create({ userId: userId, startDay: startDay })
       .then(async (week) => {
-        console.log(
-          "=====>>>>> ",
-          formattedDay(getDayOfWeek(rowStartDay, 0)),
-          startDay
-        );
+        console.log("=====>>>>> ", formattedDay(getFirstDayOfWeek()), startDay);
         if (week.id) {
           await Day.create({
             weekId: week.id,
             userId: userId,
             dateName: "Monday",
-            date: formattedDay(getDayOfWeek(rowStartDay, 0)),
+            date: formattedDay(getFirstDayOfWeek()),
           })
             .then((day) => {
               if (mondayActivities.length > 0) {
@@ -397,7 +401,7 @@ router
         .innerJoin("activities", "days.id", "=", "activities.dayId")
         .where("weeks.userId", userId)
         .where("activities?.hasCompleted", "IS NOT", null)
-        // .options({ nestTables: true })
+        .options({ nestTables: true })
         .select("weeks.*", "days.*", "activities.*")
         .then((data) => {
           // console.log(data);

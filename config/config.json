@@ -1,0 +1,26 @@
+{
+  "development": {
+    "username": "zt45@eptmysql",
+    "password": "mysqlTEST1!",
+    "database": "eptmysql",
+    "host": "eptmysql.mysql.database.azure.com",
+    "port": "3306",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "zt45@eptmysql",
+    "password": "mysqlTEST1!",
+    "database": "eptmysql",
+    "host": "eptmysql.mysql.database.azure.com",
+    "port": "3306",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "ept",
+    "password": "ept!45@DB",
+    "database": "eptpsql",
+    "host": "vcm-20066.vm.duke.edu",
+    "port":"5432",
+    "dialect": "postgres"
+  }
+}
