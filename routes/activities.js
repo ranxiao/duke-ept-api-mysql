@@ -391,11 +391,6 @@ router
     const { userId, startDay, showMonthlyView } = req.body;
 
     if (showMonthlyView) {
-      console.log(
-        "****************************",
-        startDay,
-        "*******************"
-      );
       knexDB("weeks")
         .innerJoin("days", "weeks.id", "=", "days.weekId")
         .innerJoin("activities", "days.id", "=", "activities.dayId")
@@ -405,33 +400,20 @@ router
         .select("weeks.*", "days.*", "activities.*")
         .then((data) => {
           // console.log(data);
-          // let week;
-          // let days = [];
-          // let activities = [];
-          // console.log("startDay : =====> ", startDay);
+          let activities = [];
 
-          // data.map((d, i) => {
-          //   console.log(
-          //     "===== > ",
-          //     startDay,
-          //     month,
-          //     d?.days?.date?.substring(0, 2) === month
-          //   );
-          //   if (d?.days?.date.substring(0, 2) === month) {
-          //     week = d.weeks;
-          //     days.push(d.days);
-
-          //     if (d.activities?.hasCompleted === 0) {
-          //       activities.push({ ...d.activities, mET: 0 });
-          //     } else {
-          //       activities.push(d.activities);
-          //     }
-          //   }
-          // });
+          data.map((d, i) => {
+            console.log("No Months ===========> ", d?.hasCompleted);
+            if (d?.hasCompleted === 0) {
+              activities.push({ ...d, mET: 0 });
+            } else {
+              activities.push(d);
+            }
+          });
 
           // console.log(" ===============> ",days, " ================= ");
           let newDays = [
-            ...new Map(data.map((item) => [item["id"], item])).values(),
+            ...new Map(activities.map((item) => [item["id"], item])).values(),
           ];
 
           res.status(200).json(newDays);
@@ -448,26 +430,20 @@ router
         // .options({ nestTables: true })
         .select("weeks.*", "days.*", "activities.*")
         .then((data) => {
-          // console.log("No Months", userId, startDay, month, data);
+          let activities = [];
 
-          // let week;
-          // let days = [];
-          // let activities = [];
-
-          // data.map((d, i) => {
-          //   week = d.weeks;
-          //   days.push(d.days);
-
-          //   if (d.activities?.hasCompleted === 0) {
-          //     activities.push({ ...d.activities, mET: 0 });
-          //   } else {
-          //     activities.push(d.activities);
-          //   }
-          // });
+          data.map((d, i) => {
+            console.log("No Months ===========> ", d?.hasCompleted);
+            if (d?.hasCompleted === 0) {
+              activities.push({ ...d, mET: 0 });
+            } else {
+              activities.push(d);
+            }
+          });
 
           // console.log(" ===============> ",data, " ================= ");
           let newDays = [
-            ...new Map(data.map((item) => [item["id"], item])).values(),
+            ...new Map(activities.map((item) => [item["id"], item])).values(),
           ];
           console.log(" ===============> ", newDays, " =================>");
 
