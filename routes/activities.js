@@ -390,13 +390,15 @@ router
   .post("/summary", async (req, res) => {
     const { userId, startDay, showMonthlyView } = req.body;
 
+    console.log(" ======= XXXXXXX ====== > ", showMonthlyView);
+
     if (showMonthlyView) {
       knexDB("weeks")
         .innerJoin("days", "weeks.id", "=", "days.weekId")
         .innerJoin("activities", "days.id", "=", "activities.dayId")
         .where("weeks.userId", userId)
-        .where("activities?.hasCompleted", "IS NOT", null)
-        .options({ nestTables: true })
+        .where("activities.hasCompleted", "IS NOT", null)
+        // .options({ nestTables: true })
         .select("weeks.*", "days.*", "activities.*")
         .then((data) => {
           // console.log(data);
@@ -415,6 +417,8 @@ router
           let newDays = [
             ...new Map(activities.map((item) => [item["id"], item])).values(),
           ];
+
+          console.log(" ======= XXXXXXX ====== > ", newDays);
 
           res.status(200).json(newDays);
           // res.status(200).json({ week, days: newDays, activities });

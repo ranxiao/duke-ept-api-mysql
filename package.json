@@ -7,7 +7,6 @@
     "start": "node app.js",
     "dev": "nodemon app.js"
   },
-  "author": "Saidul Badhon",
   "license": "ISC",
   "dependencies": {
     "bcryptjs-then": "^1.0.1",
